@@ -1,0 +1,112 @@
+* {
+    box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+    padding: 0;
+    margin: 0;
+    height: 100%;
+    width: 100%;
+}
+
+html {
+    overflow: hidden;
+}
+
+body {
+    font-family: "Segoe UI", sans-serif;
+    overflow-y: auto;
+    background-color: #1a1a1a;
+    color: #e9e9e9;
+    padding: 40px;
+}
+
+#root {
+    max-width: 1024px;
+    margin: auto;
+    height: fit-content;
+    display: flex;
+    flex-direction: column;
+    gap: 60px;
+}
+
+button {
+    border: none;
+    border-radius: 1000px;
+    padding: 15px 20px;
+    background-color: transparent;
+    color: #e9e9e9;
+    cursor: pointer;
+    font-family: "Segoe UI", sans-serif;
+    font-weight: bold;
+}
+
+button:hover {
+    background-color: #3a3a3a;
+}
+
+.appbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.appbar > .app-title {
+    margin-block: 0;
+}
+
+.appbar > .actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.main-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-column-gap: 20px;
+    grid-row-gap: 20px;
+}
+
+.main-grid > .organ {
+    display: flex;
+    flex-direction: column;
+    border: solid 2px #3a3a3a;
+    border-radius: 15px;
+    overflow: hidden;
+    cursor: pointer;
+    position: relative;
+}
+
+.main-grid > .organ > .preview {
+    width: 100%;
+    height: 200px;
+    background-image: url("https://www.famsf.org/storage/images/0a149627-a06c-4b51-991c-4183ed1ff8a3/78723ad0.jpg?crop=3000,1689,x0,y172&format=jpg&quality=80");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    flex-shrink: 0;
+    transition: .3s;
+}
+
+.main-grid > .organ:hover > .preview {
+    scale: 1.1;
+}
+
+.main-grid > .organ > .content {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 1;
+}
+
+.main-grid > .organ > .content > .name {
+    margin-block: 0;
+}
+
+.main-grid > .organ > .content > .infos {
+    color: #afafaf;
+}
