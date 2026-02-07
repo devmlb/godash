@@ -2,6 +2,7 @@
     --color-background: #fcfcfc;
     --color-surface: #ffffff;
     --color-surface-dark: #e0e0e0;
+    --color-surface-darker: #cccccc;
     --color-on-surface: #121212;
     --color-on-surface-low-emphasis: #424242;
 }
@@ -123,7 +124,7 @@ main > .grid > .organ > .cover {
     color: var(--color-on-surface-low-emphasis);
 }
 
-main > .grid > .organ:hover > .cover {
+main > .grid > .organ:hover > .cover:not(.shimmer-loading) {
     scale: 1.1;
 }
 
@@ -141,4 +142,21 @@ main > .grid > .organ > .content > .name {
 
 main > .grid > .organ > .content > .infos {
     color: var(--color-on-surface-low-emphasis);
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -1000px 0;
+    }
+
+    100% {
+        background-position: 1000px 0;
+    }
+}
+
+.shimmer-loading {
+    animation: shimmer 2s infinite linear;
+    background: linear-gradient(to right, var(--color-surface-dark) 4%, var(--color-surface-darker) 25%, var(--color-surface-dark) 36%);
+    background-size: 1000px 100% !important;
+    background-repeat: repeat !important;
 }

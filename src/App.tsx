@@ -24,7 +24,6 @@ function OrganCard({
         [],
         pywebviewReady,
     );
-    console.log(cover)
 
     return (
         <div
@@ -33,9 +32,9 @@ function OrganCard({
             onClick={() => setSelected(organ)}
         >
             <div
-                className="cover"
+                className={`cover${isCoverLoading ? " shimmer-loading" : ""}`}
                 style={
-                    cover
+                    cover && !isCoverLoading
                         ? {
                               backgroundImage: `url(${cover})`,
                           }
