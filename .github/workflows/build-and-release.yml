@@ -1,0 +1,121 @@
+name: Build and Release on Version Change
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - '.env.production'
+
+jobs:
+  check-version-change:
+    runs-on: ubuntu-latest
+    outputs:
+      version_changed: ${{ steps.check.outputs.version_changed }}
+      new_version: ${{ steps.check.outputs.new_version }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      
+      - name: Check if VITE_VERSION changed
+        id: check
+        run: |
+          # Get the current VITE_VERSION
+          CURRENT_VERSION=$(grep '^VITE_VERSION=' .env.production | cut -d '=' -f2 | tr -d '"' | tr -d ' ')
+          echo "Current version: $CURRENT_VERSION"
+          
+          # Get the previous VITE_VERSION from the previous commit
+          git checkout HEAD~1 -- .env.production 2>/dev/null || PREVIOUS_VERSION=""
+          if [ -f .env.production ]; then
+            PREVIOUS_VERSION=$(grep '^VITE_VERSION=' .env.production | cut -d '=' -f2 | tr -d '"' | tr -d ' ')
+          else
+            PREVIOUS_VERSION=""
+          fi
+          echo "Previous version: $PREVIOUS_VERSION"
+          
+          # Restore current version
+          git checkout HEAD -- .env.production
+          
+          # Check if version changed
+          if [ "$CURRENT_VERSION" != "$PREVIOUS_VERSION" ] && [ -n "$CURRENT_VERSION" ]; then
+            echo "version_changed=true" >> $GITHUB_OUTPUT
+            echo "new_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+            echo "Version changed from '$PREVIOUS_VERSION' to '$CURRENT_VERSION'"
+          else
+            echo "version_changed=false" >> $GITHUB_OUTPUT
+            echo "Version unchanged or empty"
+          fi
+
+  build-and-release:
+    needs: check-version-change
+    if: needs.check-version-change.outputs.version_changed == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install Node dependencies
+        run: npm install
+      
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyinstaller
+          pip install -r requirements.txt
+      
+      - name: Build frontend
+        run: npm run frontend:prod
+      
+      - name: Build application with PyInstaller
+        run: pyinstaller build-windows.spec
+      
+      - name: Verify build output
+        run: |
+          echo "Checking dist folder contents:"
+          ls -la dist/
+          if [ -d "dist/GO Dash" ]; then
+            echo "GO Dash folder found"
+            ls -la "dist/GO Dash/"
+          else
+            echo "Error: GO Dash folder not found"
+            exit 1
+          fi
+      
+      - name: Create zip archive
+        run: |
+          cd dist
+          zip -r "GO-Dash-${{ needs.check-version-change.outputs.new_version }}.zip" "GO Dash"
+          cd ..
+          mv "dist/GO-Dash-${{ needs.check-version-change.outputs.new_version }}.zip" .
+      
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.check-version-change.outputs.new_version }}
+          name: Release ${{ needs.check-version-change.outputs.new_version }}
+          body: |
+            Automatic release for version ${{ needs.check-version-change.outputs.new_version }}
+            
+            Built from commit ${{ github.sha }}
+          files: |
+            GO-Dash-${{ needs.check-version-change.outputs.new_version }}.zip
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
