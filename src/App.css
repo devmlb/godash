@@ -28,6 +28,48 @@ body,
     color: var(--color-on-surface);
     display: flex;
     flex-direction: column;
+
+    & > .appbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 30px;
+
+        & > .branding {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+
+            & > .logo {
+                width: 36px;
+                height: auto;
+            }
+
+            & > .title {
+                margin-block: 0;
+            }
+
+            & > .version {
+                padding: 4px 10px;
+                font-size: 12px;
+                font-weight: 500;
+                background-color: var(--color-surface-dark);
+                border-radius: 100px;
+            }
+        }
+
+        & > .actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+    }
+
+    & > main {
+        flex-grow: 1;
+        overflow-y: auto;
+        display: flex;
+    }
 }
 
 button {
@@ -45,203 +87,6 @@ button {
 
 button:hover {
     background-color: var(--color-surface-dark);
-}
-
-.appbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 30px;
-}
-
-.appbar > .branding {
-    display: flex;
-    gap: 20px;
-    align-items: center;
-}
-
-.appbar > .branding > .logo {
-    width: 36px;
-    height: auto;
-}
-
-.appbar > .branding > .title {
-    margin-block: 0;
-}
-
-.appbar > .branding > .version {
-    padding: 4px 10px;
-    font-size: 12px;
-    font-weight: 500;
-    background-color: var(--color-surface-dark);
-    border-radius: 100px;
-}
-
-.appbar > .actions {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-}
-
-main {
-    flex-grow: 1;
-    overflow-y: auto;
-    display: flex;
-}
-
-main > .panel {
-    width: 400px;
-    background-color: var(--color-surface);
-    margin-right: 30px;
-    margin-bottom: 30px;
-    border-radius: 15px;
-    position: sticky;
-    top: 0;
-    flex-shrink: 0;
-    border: solid 1px var(--color-surface-dark);
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-}
-
-main > .panel > .preview-container {
-    overflow: hidden;
-    position: relative;
-    height: 300px;
-    cursor: pointer;
-}
-
-main > .panel > .preview-container > .preview {
-    width: 100%;
-    height: 100%;
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: center;
-    transition: scale .3s;
-}
-
-main > .panel > .none {
-    display: flex;
-    height: 100%;
-    width: 100%;
-    color: var(--color-on-surface-low-emphasis);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-main > .panel > .content {
-    flex-grow: 1;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
-    color: var(--color-on-surface-low-emphasis);
-}
-
-main > .panel > .content > .legend {
-    font-size: 12px;
-    font-weight: 500;
-}
-
-main > .panel > .content > .actions {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    gap: 20px;
-}
-
-main > .panel > .content > .actions > .infos {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-main > .panel > .content > .actions > .infos > div {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-main > .panel > .content > .actions > .infos > .name {
-    color: var(--color-on-surface);
-    margin-block-start: 0;
-}
-
-main > .grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    height: fit-content;
-    padding: 30px;
-    padding-top: 0;
-    flex-grow: 1;
-}
-
-main > .grid > .organ {
-    display: flex;
-    flex-direction: column;
-    border: solid 1px var(--color-surface-dark);
-    border-radius: 15px;
-    overflow: hidden;
-    cursor: pointer;
-    position: relative;
-    background-color: var(--color-surface);
-    min-width: 300px;
-    max-width: 400px;
-    flex-grow: 1;
-}
-
-main > .grid > .organ > .cover {
-    width: 100%;
-    height: 200px;
-    flex-shrink: 0;
-    overflow: hidden;
-}
-
-main > .grid > .organ > .cover > .error,
-main > .grid > .organ > .cover > .image {
-    width: 100%;
-    height: 100%;
-}
-
-main > .grid > .organ > .cover > .error {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--color-on-surface-low-emphasis);
-    background-color: var(--color-surface);
-    padding: 20px;
-    text-align: center;
-}
-
-main > .grid > .organ > .cover > .image {
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: center;
-    transition: scale 0.3s;
-}
-
-main > .grid > .organ:hover > .cover > .image {
-    scale: 1.1;
-}
-
-main > .grid > .organ > .content {
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    z-index: 1;
-}
-
-main > .grid > .organ > .content > .name {
-    margin-block: 0;
-}
-
-main > .grid > .organ > .content > .infos {
-    color: var(--color-on-surface-low-emphasis);
 }
 
 @keyframes shimmer {
