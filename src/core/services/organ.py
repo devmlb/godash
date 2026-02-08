@@ -31,19 +31,22 @@ class Organ_Service:
             if organ["id"] == id:
                 return organ
             
-        raise Exception("Cannot find argon with id " + id)
+        raise Exception("Cannot find organ with id " + id)
 
     def open(self, id: str) -> None:
-        self.storage_service.open_file(self.get(id)["path"])
+        try:
+            self.storage_service.open_file(self.get(id)["path"])
+        except:
+            raise Exception(f"No path provided for organ with id '{id}'")
 
     def get_cover_b64(self, id: str) -> str:
         try:
             return self.storage_service.get_image_b64(self.get(id)["cover"])
         except:
-            raise Exception(f"Warning: no cover provided for organ with id '{id}'")
+            raise Exception(f"No cover provided for organ with id '{id}'")
 
     def get_preview_b64(self, id: str) -> str:
         try:
             return self.storage_service.get_image_b64(self.get(id)["preview"])
         except:
-            raise Exception(f"Warning: no preview provided for organ with id '{id}'")
+            raise Exception(f"No preview provided for organ with id '{id}'")

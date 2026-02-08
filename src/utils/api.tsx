@@ -45,4 +45,10 @@ async function reloadOrgans(): Promise<void> {
     }
 }
 
-export { openConfig, getOrgansList, getCover, getPreview, reloadOrgans };
+async function openOrgan(organId: string): Promise<void> {
+    if (import.meta.env.VITE_UI_ONLY !== "true") {
+        await window.pywebview.api.open_organ(organId);
+    }
+}
+
+export { openConfig, getOrgansList, getCover, getPreview, reloadOrgans, openOrgan };

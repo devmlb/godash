@@ -7,6 +7,7 @@ import {
     getCover,
     getPreview,
     reloadOrgans,
+    openOrgan,
 } from "./utils/api";
 import { useApi } from "./utils/hooks/api.hook";
 import type { Organ } from "./utils/types/api.types";
@@ -124,7 +125,9 @@ function Panel({
                                     <div>{`Par ${selectedOrgan.creator}`}</div>
                                     <div>{selectedOrgan.date.toString()}</div>
                                 </div>
-                                <button onClick={openConfig}>
+                                <button
+                                    onClick={() => openOrgan(selectedOrgan.id)}
+                                >
                                     Ouvrir l'orgue
                                 </button>
                             </div>
