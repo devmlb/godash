@@ -27,17 +27,23 @@ jobs:
           CURRENT_VERSION=$(grep '^VITE_VERSION=' .env.production | cut -d '=' -f2 | tr -d '"' | tr -d ' ')
           echo "Current version: $CURRENT_VERSION"
           
-          # Get the previous VITE_VERSION from the previous commit
-          git checkout HEAD~1 -- .env.production 2>/dev/null || PREVIOUS_VERSION=""
-          if [ -f .env.production ]; then
-            PREVIOUS_VERSION=$(grep '^VITE_VERSION=' .env.production | cut -d '=' -f2 | tr -d '"' | tr -d ' ')
-          else
+          # Check if previous commit exists
+          if ! git rev-parse HEAD~1 >/dev/null 2>&1; then
+            echo "No previous commit found (initial commit)"
             PREVIOUS_VERSION=""
+          else
+            # Get the previous VITE_VERSION from the previous commit
+            if git checkout HEAD~1 -- .env.production 2>&1; then
+              PREVIOUS_VERSION=$(grep '^VITE_VERSION=' .env.production | cut -d '=' -f2 | tr -d '"' | tr -d ' ')
+            else
+              echo "File did not exist in previous commit"
+              PREVIOUS_VERSION=""
+            fi
+            echo "Previous version: $PREVIOUS_VERSION"
+            
+            # Restore current version
+            git checkout HEAD -- .env.production
           fi
-          echo "Previous version: $PREVIOUS_VERSION"
-          
-          # Restore current version
-          git checkout HEAD -- .env.production
           
           # Check if version changed
           if [ "$CURRENT_VERSION" != "$PREVIOUS_VERSION" ] && [ -n "$CURRENT_VERSION" ]; then
@@ -52,7 +58,7 @@ jobs:
   build-and-release:
     needs: check-version-change
     if: needs.check-version-change.outputs.version_changed == 'true'
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     permissions:
       contents: write
     steps:
@@ -88,23 +94,39 @@ jobs:
       - name: Verify build output
         run: |
           echo "Checking dist folder contents:"
-          ls -la dist/
-          if [ -d "dist/GO Dash" ]; then
+          dir dist
+          if (Test-Path "dist\GO Dash") {
             echo "GO Dash folder found"
-            ls -la "dist/GO Dash/"
-          else
+            dir "dist\GO Dash"
+          } else {
             echo "Error: GO Dash folder not found"
             exit 1
-          fi
+          }
+        shell: pwsh
       
       - name: Create zip archive
         run: |
-          cd dist
-          zip -r "GO-Dash-${{ needs.check-version-change.outputs.new_version }}.zip" "GO Dash"
-          cd ..
-          mv "dist/GO-Dash-${{ needs.check-version-change.outputs.new_version }}.zip" .
+          Compress-Archive -Path "dist\GO Dash\*" -DestinationPath "GO-Dash-${{ needs.check-version-change.outputs.new_version }}.zip"
+        shell: pwsh
+      
+      - name: Check if release exists
+        id: check_release
+        run: |
+          $tag = "${{ needs.check-version-change.outputs.new_version }}"
+          $releases = gh release list --limit 100
+          if ($releases -match $tag) {
+            echo "release_exists=true" >> $env:GITHUB_OUTPUT
+            echo "Release $tag already exists"
+          } else {
+            echo "release_exists=false" >> $env:GITHUB_OUTPUT
+            echo "Release $tag does not exist"
+          }
+        shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
       - name: Create Release
+        if: steps.check_release.outputs.release_exists == 'false'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ needs.check-version-change.outputs.new_version }}
