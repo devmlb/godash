@@ -39,4 +39,10 @@ async function getPreview(organId: string): Promise<string> {
     }
 }
 
-export { openConfig, getOrgansList, getCover, getPreview };
+async function reloadOrgans(): Promise<void> {
+    if (import.meta.env.VITE_UI_ONLY !== "true") {
+        await window.pywebview.api.reload_organs_list();
+    }
+}
+
+export { openConfig, getOrgansList, getCover, getPreview, reloadOrgans };

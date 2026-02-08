@@ -32,3 +32,6 @@ class API:
 
     def open_config(self) -> None:
         self.storage_service.open_file(self.storage_service.get_config_path())
+
+    def reload_organs_list(self) -> None:
+        self.organ_service.reload()

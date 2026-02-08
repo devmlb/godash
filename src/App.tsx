@@ -1,7 +1,13 @@
 import { useState, type Dispatch, type JSX, type SetStateAction } from "react";
 
 import "./App.css";
-import { openConfig, getOrgansList, getCover, getPreview } from "./utils/api";
+import {
+    openConfig,
+    getOrgansList,
+    getCover,
+    getPreview,
+    reloadOrgans,
+} from "./utils/api";
 import { useApi } from "./utils/hooks/api.hook";
 import type { Organ } from "./utils/types/api.types";
 import { useBridge } from "./utils/hooks/bridge.hook";
@@ -118,7 +124,9 @@ function Panel({
                                     <div>{`Par ${selectedOrgan.creator}`}</div>
                                     <div>{selectedOrgan.date.toString()}</div>
                                 </div>
-                                <button onClick={openConfig}>Ouvrir l'orgue</button>
+                                <button onClick={openConfig}>
+                                    Ouvrir l'orgue
+                                </button>
                             </div>
                         </div>
                     </>
@@ -133,19 +141,26 @@ function Panel({
 function App(): JSX.Element {
     const pywebviewReady = useBridge();
 
+    const [selected, setSelected] = useState<Organ | null>(null);
+    const [reloadTime, setReloadTime] = useState<number>(Date.now());
     const {
         data: organs,
         isLoading,
         error,
-    } = useApi<Organ[]>(getOrgansList, [], pywebviewReady);
+    } = useApi<Organ[]>(getOrgansList, [reloadTime], pywebviewReady);
 
-    const [selected, setSelected] = useState<Organ | null>(null);
+    const reload = async (): Promise<void> => {
+        await reloadOrgans();
+        setSelected(null);
+        setReloadTime(Date.now());
+    };
 
     return (
         <>
             <div className="appbar">
                 <h1 className="app-title">GO Dash</h1>
                 <div className="actions">
+                    <button onClick={reload}>Recharger</button>
                     <button onClick={openConfig}>Éditer la config</button>
                 </div>
             </div>
